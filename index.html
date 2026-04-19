@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>"Throne of Glass" Character Tracker Map</title>    <!-- Browser title -->
+    <meta charset="utf-8" />
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<!-- MarkerCluster CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
+
+<!-- Leaflet JS (REQUIRED) -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- MarkerCluster JS (AFTER Leaflet) -->
+<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+
+<div class="map-title">"Throne of Glass" Character Tracker Map</div>    <!-- Top of the page map title -->
+<div id="map"></div>
+
+    <style>
+        #map { height: 100vh; }
+
+        /* Map title styling */
+        .map-title {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* LandAreas (Terrasen, etc.) styling */
+        .region-label {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            font-family: "Cinzel", serif;
+            font-size: 20px;
+            font-weight: bold;
+            color: #525C50;
+            text-shadow: 1px 1px 3px rgba(255,255,255,0.8);
+            white-space: normal;
+            max-width: 200px;
+            text-align: center;
+        }
+
+        .region-label::before { /* removes the triangle in the label */
+            display: none;
+        }
+
+        /* Habitats styling */
+        .habitat-label {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            font-family: "Cinzel", serif;
+            font-size: 12px;
+            font-weight: bold;
+            color: #5a4a2f;
+            text-shadow: 1px 1px 3px rgba(255,255,255,0.8);
+            white-space: normal;
+            max-width: 150px;
+            text-align: center;
+        }
+
+        .habitat-label::before {    /* removes the triangle in the label */
+            display: none;
+        }
+
+        /* POI (cities, oceans, etc.) styling */
+        .poi-label {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            color:#2b2b2b;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 0;
+            text-shadow: 1px 1px 3px rgba(255,255,255,0.8);
+            font-family: "Cinzel", serif;
+        }
+
+        .poi-label::before {    /* removes the triangle in the label */
+             display: none;
+        }
+
+        /* Water styling */
+        .water-label {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            color:black;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 0;
+            text-shadow: 1px 1px 3px rgba(255,255,255,0.8);
+            font-family: "Cinzel", serif;
+        }
+
+        .water-label::before {  /* removes the triangle in the label */
+             display: none;
+        }
+
+        /* Character styling */
+        .character-label {
+            background: white;
+            border: none;
+            box-shadow: none;
+            padding: 4px 8px;
+            font-family: "Inter", serif;
+            font-size: 13px;
+            font-weight: bold;
+            color: black;
+
+            white-space: normal;           /* allow wrapping */
+            max-width: 200px;              /* control max width */
+            width: max-content;            /* THIS is the magic */
+            display: block;                /* ensures width applies */
+            max-height: 120px;
+            overflow-y: auto;
+
+            text-align: center;
+            line-height: 1.3;               /* improves readability */
+            word-break: break-word;
+        }
+
+        .character-label::before {  /* removes the triangle in the label */
+            display: none;
+            white-space: normal;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        /* Drop-down styling */
+        .controls {
+            position: absolute;
+            top: 55px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 14px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: flex;
+            gap: 10px;
+        }
+
+        .controls select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Cpath d='M0 2l5 5 5-5' fill='none' stroke='black'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 10px;
+
+            padding: 6px 30px 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .controls select:hover {    /* Hover/focus */
+            border-color: #888;
+        }
+
+        .controls select:focus {
+            outline: none;
+            border-color: #555;
+        }
+
+        .controls button {
+            width: 26px;
+            height: 26px;
+            border: none;
+            background: white;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+
+        .controls button:hover {
+            background: #eee;
+        }
+       
+    </style>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Uncial+Antiqua&family=IM+Fell+English&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="controls">
+    <select id="bookSelect" onchange="updateFilters()">     
+        <option value="TOG">Throne of Glass</option>
+        <option value="COM">Crown of Midnight</option>
+        <option value="AB">The Assassin's Blade</option>
+        <option value="HOF">Heir of Fire</option>
+        <option value="QOS">Queen of Shadows</option>
+        <option value="EOSTOD">Empire of Storms/Tower of Dawn</option>
+        <option value="KOA">Kingdom of Ash</option>
+    </select>
+
+    <select id="chapterSelect" onchange="updateFilters()">  
+    </select>
+
+    <button id="prevChapter">▲</button>
+    <button id="nextChapter">▼</button>
+
+    <button id="toggleCharacters">👁️</button>
+
+</div>
+
+<div id="map"></div>
+
+<script>
+//1. GLOBAL VARIABLES
+// Create map
+var map = L.map('map', {
+    maxZoom: 22
+}).setView([20, 0], 2);
+
+let charactersVisible = true;
+
+var starIcon = L.icon({
+    iconUrl: 'icons/star.png',
+    iconSize: [25, 25],       // size of the icon
+    iconAnchor: [12, 12],     // center point
+    popupAnchor: [0, -10]
+});
+
+let allCharacterData;
+var characterLayer;
+var markers = L.markerClusterGroup({
+    maxClusterRadius: 30,
+    zoomToBoundsOnClick: false
+});
+
+// 2. CONFIG DATA
+// Number of chapters in each book except Assassin's Blade
+const bookChapters = {          //NEED TO DOUBLE CHECK!
+    "TOG": 55,
+    "COM": 56,
+    "HOF": 68,
+    "QOS": 63,
+    "EOSTOD": 70,
+    "KOA": 120
+};
+
+// Number of chapters in Assassin's Blade novellas
+const assassinBladeStructure = [
+    { name: "The Pirate Lord", chapters: 10 },
+    { name: "The Healer", chapters: 6 },
+    { name: "The Desert", chapters: 12 },
+    { name: "The Underworld", chapters: 12 },
+    { name: "The Empire", chapters: 14 }
+];
+
+// 3. MAP INITIALIZATION
+//basemap
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+    maxZoom: 19  // tile limit
+}).addTo(map);
+
+// Naming panes to create drawing order
+map.createPane('landPane');
+map.createPane('landareasPane');
+map.createPane('habitatPane');
+map.createPane('poilinesPane');
+map.createPane('waterPane');
+map.createPane('poiPane');
+map.createPane('characterPane');
+
+// Set drawing order (higher # = on top)
+map.getPane('landPane').style.zIndex = 200;
+map.getPane('landareasPane').style.zIndex = 250;
+map.getPane('habitatPane').style.zIndex = 300;
+map.getPane('poilinesPane').style.zIndex = 350;
+map.getPane('waterPane').style.zIndex = 400;
+map.getPane('poiPane').style.zIndex = 450;
+map.getPane('characterPane').style.zIndex = 1000;
+
+map.on('zoomend', function() {
+    markers.eachLayer(function(layer) {
+        if (layer.getTooltip) {
+            if (map.getZoom() >= 6) {
+                layer.openTooltip();
+            } else {
+                layer.closeTooltip();
+            }
+        }
+    });
+});
+
+// 4. FUNCTIONS
+
+// Every time a book is selected from the drop-down, the Chapter drop-down is updated
+function updateChapterDropdown(selectedBook) {
+    const chapterSelect = document.getElementById("chapterSelect");
+
+    // Clear existing options
+    chapterSelect.innerHTML = "";
+
+    // Special case for Assassin's Blade
+    if (selectedBook === "AB") {
+
+        assassinBladeStructure.forEach(novella => {
+            for (let i = 1; i <= novella.chapters; i++) {
+                const option = document.createElement("option");
+
+                // Store BOTH novella + chapter
+                option.value = `${novella.name}|${i}`;
+
+                // What user sees
+                option.textContent = `${novella.name} - Ch ${i}`;
+
+                chapterSelect.appendChild(option);
+            }
+        });
+
+    } else {
+        // Normal books (your existing logic)
+        const totalChapters = bookChapters[selectedBook];
+
+        for (let i = 1; i <= totalChapters; i++) {
+            const option = document.createElement("option");
+            option.value = i;
+            option.textContent = `Chapter ${i}`;
+            chapterSelect.appendChild(option);
+        }
+    }
+}
+
+function updateFilters() {
+    showFiltered();
+}
+
+// Tells the map which points to show
+function showFiltered() {
+
+    let selectedBook = document.getElementById("bookSelect").value;
+    let selectedValue = document.getElementById("chapterSelect").value;
+
+    let selectedChapter;
+    let selectedNovella = null;
+
+    if (selectedBook === "AB") {
+        const parts = selectedValue.split("|");
+        selectedNovella = parts[0];
+        selectedChapter = parseInt(parts[1]);
+    } else {
+        selectedChapter = parseInt(selectedValue);
+    }
+    
+    window.locationCounts = {};
+
+    markers.clearLayers();
+
+    characterLayer = L.geoJSON(allCharacterData, {
+
+        filter: function (feature) {
+
+            let matchBook = selectedBook 
+                ? feature.properties.Book === selectedBook 
+                : true;
+
+            let matchChapter = selectedChapter 
+                ? feature.properties.Chapter == selectedChapter 
+                : true;
+
+            let matchNovella = true;
+
+            if (selectedBook === "AB") {
+                matchNovella = selectedNovella 
+                    ? feature.properties.Novella === selectedNovella 
+                    : true;
+            }
+
+            return matchBook && matchChapter && matchNovella;
+        },
+
+        pointToLayer: function (feature, latlng) {
+
+            const location = feature.properties.Location; // use a field that groups same-place points
+
+            // Track how many points we've already placed at this location
+            if (!window.locationCounts) window.locationCounts = {};
+            if (!locationCounts[location]) locationCounts[location] = 0;
+
+            const index = locationCounts[location]++;
+            const total = 10; // approximate max points at a location (can be tweaked)
+
+            // THIS is where angle lives
+            const angle = (index / total) * Math.PI * 2;
+
+            const distance = 0.00015; // tweak this for spacing
+
+            const newLat = latlng.lat + Math.sin(angle) * distance;
+            const newLng = latlng.lng + Math.cos(angle) * distance;
+
+            return L.circleMarker([newLat, newLng], {
+                radius: 2,
+                fillColor: "white",
+                color: "white",
+                weight: 1,
+                fillOpacity: 1,
+            });
+        },
+
+        //Tells it how to place the label and which styling to use
+        onEachFeature: function(feature, layer) {
+            const name = feature.properties.Character;
+
+            const formatted = name.replace(/, /g, ", ");
+
+            layer.bindTooltip(formatted, {
+                permanent: true,
+                direction: "center",
+                className: "character-label",
+            }); 
+        }
+    });
+
+    markers.addLayer(characterLayer);
+
+    if (charactersVisible) {
+        map.addLayer(markers);
+    } else {
+        map.removeLayer(markers);
+    }
+};
+
+// 5. EVENT LISTENERS
+// Wait until the HTML is fully loaded before attaching event listeners (prevents "null element" errors when elements don't exist yet)
+document.addEventListener("DOMContentLoaded", function () {
+
+    // BOOK DROPDOWN CHANGE EVENT
+    // When the user selects a different book:
+    // 1. Rebuild the chapter dropdown for that book (or AB logic)
+    // 2. Reset chapter to first option
+    // 3. Re-filter and redraw characters on the map
+    document.getElementById("bookSelect").addEventListener("change", function () {
+        const selectedBook = this.value;
+
+        updateChapterDropdown(selectedBook);
+
+        const chapterSelect = document.getElementById("chapterSelect");
+        chapterSelect.selectedIndex = 0;
+
+        showFiltered();
+    });
+
+    // CHAPTER DROPDOWN CHANGE EVENT
+    // When the user selects a chapter:
+    // Just re-filter and update the map
+    document.getElementById("chapterSelect").addEventListener("change", function () {
+        showFiltered();
+    });
+
+});
+
+// CHARACTER VISIBILITY TOGGLE BUTTON
+// Toggles marker layer visibility on/off without changing filters
+document.getElementById("toggleCharacters").addEventListener("click", function () {
+
+    charactersVisible = !charactersVisible;
+
+    if (charactersVisible) {
+        map.addLayer(markers);      // show character markers
+        this.textContent = "👁️";    // visible state icon
+    } else {
+        map.removeLayer(markers);   // hide character markers
+        this.textContent = "🚫";    // hidden state icon
+    }
+});
+
+// PREVIOUS CHAPTER BUTTON
+// Moves chapter dropdown backward by 1 step
+// Then refreshes map using updated selection
+document.getElementById('prevChapter').onclick = () => {
+    const select = document.getElementById('chapterSelect');
+    if (select.selectedIndex > 0) {
+        select.selectedIndex--;     // go to previous chapter
+        updateFilters();            // refresh map
+    }  
+};
+
+// NEXT CHAPTER BUTTON
+// Moves chapter dropdown forward by 1 step
+// Then refreshes map using updated selection
+document.getElementById('nextChapter').onclick = () => {
+    const select = document.getElementById('chapterSelect');
+    if (select.selectedIndex < select.options.length - 1) {
+        select.selectedIndex++;     // go to next chapter
+        updateFilters();            // refresh map
+    }
+};
+
+// 6. DATA LOAD (fetch)
+// LAND
+fetch('Land_040426.geojson')
+    .then(response => response.json())
+    .then(data => {
+        var landLayer = L.geoJSON(data, {
+            pane: 'landPane',
+            style: {
+            color: "#101B12", 
+            fillColor: "#949C77"}
+        }).addTo(map);
+        map.fitBounds(landLayer.getBounds());
+    });
+
+// LAND-AREAS
+fetch('Land_Areas_040426.geojson')
+    .then(response => response.json())
+    .then(data => {
+        var landareaLayer = L.geoJSON(data, {
+            pane: 'landareasPane',
+            style: {
+            color: "#101B12",
+            weight: 1,
+            fillColor: "#949C77",
+            fillOpacity: 0.6 },
+      
+            onEachFeature: function(feature, layer) {
+                const name = feature.properties.Name;
+
+                // Split label manually or format as needed
+                const formatted = name.replace(" - ", "<br>");
+
+                layer.bindTooltip(formatted, {
+                    permanent: true,
+                    direction: "center",
+                    className: "region-label"
+                });
+
+                // Show labels at map level 14+
+                map.on('zoomend', function() {
+                    if (map.getZoom() >= 14) {
+                        layer.openTooltip();
+                    } else {
+                        layer.closeTooltip();
+                    }
+                });
+            }
+        }).addTo(map);
+
+    }); 
+
+
+// HABITAT
+fetch('Habitat_040426.geojson')
+    .then(response => response.json())
+    .then(data => {
+
+        var habitatLayer = L.geoJSON(data, {
+            pane: 'habitatPane',
+
+            style: function(feature) {
+                let type = feature.properties.Type;
+                return {
+                    color: "#555",
+                    weight: 1,
+                    fillOpacity: 0.9,
+                    fillColor:
+                        type === "Forest" ? "#465D38" :
+                        type === "Desert" ? "#F6F7ED" :
+                        type === "Mountain" ? "#E6E6E6" :
+                        type === "Lake" ? "#2A4461" :
+                        "#ccc"
+                };
+            },
+
+            onEachFeature: function(feature, layer) {
+                const name = feature.properties.Name;
+
+                // Split label manually or format as needed
+                const formatted = name.replace(" - ", "<br>");
+
+                layer.bindTooltip(formatted, {
+                    permanent: true,
+                    direction: "center",
+                    className: "habitat-label"
+                });
+
+                // Show labels at map level 16+
+                map.on('zoomend', function() {
+                    if (map.getZoom() >= 16) {
+                        layer.openTooltip();
+                    } else {
+                        layer.closeTooltip();
+                    }
+                });
+            }
+
+        }).addTo(map);
+
+    });
+
+// POI-Lines
+fetch('POI_Lines_040426.geojson')
+  .then(response => response.json())
+  .then(data => {
+        var poilinesLayer = L.geoJSON(data, {
+            pane: 'poilinesPane',
+            style: { color: "#808080", fillColor: "#ccc", fillOpacity: 0.5 },
+
+            onEachFeature: function(feature, layer) {
+
+                const name = feature.properties.Name;
+                const angle = feature.properties.LabelAngle || 0;
+
+                const formatted = name.replace(" - ", "<br>");
+
+                layer.bindTooltip(
+                    `<div style="transform: rotate(${angle}deg); transform-origin: center;">
+                        ${formatted}
+                    </div>`,
+                    {
+                        permanent: true,
+                        direction: "center",
+                        className: "poi-label"
+                    }
+                );
+
+                // Show labels at map level 16+
+                map.on('zoomend', function() {
+                    if (map.getZoom() >= 16) {
+                        layer.openTooltip();
+                    } else {
+                        layer.closeTooltip();
+                    }
+                });
+            }
+
+        }).addTo(map);
+    }); 
+
+// Water
+fetch('Water_040426.geojson')
+    .then(response => response.json())
+    .then(data => {
+        var waterLayer = L.geoJSON(data, {
+            pane: 'waterPane', //assigns a pane which then gets weighted
+            style: { 
+                    color: "#2A4461", 
+                    fillColor: "#2A4461", 
+                    fillOpacity: 0 
+            },
+
+            onEachFeature: function(feature, layer) {
+
+                const name = feature.properties.Name;
+                const angle = feature.properties.LabelAngle || 0;
+
+                const formatted = name.replace(" - ", "<br>");
+
+                layer.bindTooltip(
+                    `<div style="transform: rotate(${angle}deg); transform-origin: center;">
+                        ${formatted}
+                    </div>`,
+                    {
+                        permanent: true,
+                        direction: "center",
+                        className: "water-label"
+                    }
+                );
+
+                // Show labels at map level 16+
+                map.on('zoomend', function() {
+                    if (map.getZoom() >= 16) {
+                        layer.openTooltip();
+                    } else {
+                        layer.closeTooltip();
+                    }
+                });
+            }
+
+        }).addTo(map);
+
+    });
+
+// POI
+fetch('POI_040426.geojson')
+    .then(response => response.json())
+    .then(data => {
+        var poiLayer = L.geoJSON(data, {
+            pane: 'poiPane',
+
+            pointToLayer: function(feature, latlng) {
+                const type = feature.properties.Type;
+
+                // IMAGE POI
+                if (type === "City") {
+                    return L.marker(latlng, {
+                        icon: starIcon,
+                        pane: 'poiPane'
+                    });
+                }
+
+                // NO SYMBOL POI (label only)
+                if (type === "Ocean") {
+                    return L.marker(latlng, {
+                        icon: L.divIcon({
+                            className: 'empty-icon',
+                            html: '',
+                            iconSize: [0, 0]
+                        }),
+                        pane: 'poiPane'
+                    });
+                }
+
+                // MISC/DEFAULT
+                return L.circleMarker(latlng, {
+                    radius: 5,
+                    color: "black",
+                    weight: 1,
+                    fillColor: "gray",
+                    fillOpacity: 1,
+                    pane: 'poiPane'
+                });
+            },
+
+            onEachFeature: function(feature, layer) {
+                layer.bindTooltip(feature.properties.Name, {
+                    permanent: true,
+                    direction: "top",
+                    offset: [-20, 0],
+                    className: "poi-label"
+                });
+
+                map.on('zoomend', function() {
+                        if (map.getZoom() >= 16) {
+                            layer.openTooltip();
+                        } else {
+                            layer.closeTooltip();
+                        }
+                });
+            }
+        }).addTo(map);
+    }); 
+
+// CHARACTERS
+fetch('Characters-Chapters_COMBINED_040426.geojson')
+    .then(response => response.json())
+    .then(data => {
+        allCharacterData = data;
+
+        console.log("Loaded features:", data.features.length);
+
+        document.getElementById("bookSelect").value = "TOG";
+
+        updateChapterDropdown("TOG");
+
+        const chapterSelect = document.getElementById("chapterSelect");
+        chapterSelect.selectedIndex = 0;
+
+        showFiltered();
+    });
+
+</script>
+</body>
+</html>
