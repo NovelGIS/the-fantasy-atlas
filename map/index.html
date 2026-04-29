@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The Fantasy Atlas by Novel GIS</title>
+    <meta charset="utf-8" />
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- MarkerCluster -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+
+    <!-- Your shared styles -->
+    <link rel="stylesheet" href="../shared/css/map.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Uncial+Antiqua&family=IM+Fell+English&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+<!-- =========================
+     TOP NAV
+========================= -->
+<div class="top-nav">
+
+    <div class="site-title">
+        <span class="main-title">The Fantasy Atlas</span>
+        <span class="byline">by Novel GIS</span>
+    </div>
+
+    <div class="nav-links">
+
+        <a href="../index.html">← All Series</a> | 
+
+        <span id="currentSeries"></span> <!-- dynamic text --> | 
+
+        <a href="../about.html">About</a> | 
+        <a href="../help.html">Help</a>
+
+    </div>
+</div>
+
+
+<!-- =========================
+     MAIN LAYOUT
+========================= -->
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+        <h3>Controls</h3>
+
+        <div class="section">
+        <h4>Book</h4>
+        <select id="bookSelect"></select>
+    </div>
+
+    <div class="section">
+        <h4>Navigation</h4>
+        <div class="chapter-nav">
+            <button id="prevChapter">◀</button>
+            <select id="chapterSelect"></select>
+            <button id="nextChapter">▶</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Display</h4>
+        <button id="toggleCharacters">👁️ Labels visible</button>
+    </div>
+
+    </div>
+
+    <!-- MAP -->
+    <div id="map"></div>
+
+</div>
+
+<!-- =========================
+     SHARED ENGINE
+========================= -->
+<script src="../shared/js/map-core.js"></script>
+<script src="../shared/js/filters.js"></script>
+<script src="../shared/js/data-loader.js"></script>
+<script src="../shared/js/ui.js"></script>
+<script src="../shared/js/icons.js"></script>
+
+
+<!-- =========================
+     MAP APP INITIALIZATION
+     (small glue layer only)
+========================= -->
+<script>
+
+const params = new URLSearchParams(window.location.search);
+const series = params.get("series") || "throne-of-glass";
+
+// Set initial UI state after everything loads
+document.addEventListener("DOMContentLoaded", function () {
+
+    // TODO: populate dynamically later from series-index.json
+    seriesSelect.innerHTML = `
+        <option value="throne-of-glass">Throne of Glass</option>
+        <option value="acotar">ACOTAR</option>
+    `;
+
+    seriesSelect.value = series;
+
+    // Series switching
+    seriesSelect.addEventListener("change", function () {
+        window.location.href = `./index.html?series=${this.value}`;
+    });
+
+});
+
+document.getElementById("seriesSelect").value = series;
+
+</script>
+
+</body>
+</html>

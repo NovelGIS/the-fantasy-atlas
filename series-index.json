@@ -1,0 +1,14 @@
+[
+  {
+    "id": "throne-of-glass",
+    "title": "Throne of Glass",
+    "description": "Assassins, kingdoms, and a slowly unraveling world.",
+    "image": "series/throne-of-glass/assets/cover.jpg"
+  },
+  {
+    "id": "acotar",
+    "title": "A Court of Thorns and Roses",
+    "description": "A popular fantasy series following huntress Feyre Archeron as she is pulled into the dangerous world of the Fae. ",
+    "image": "series/acotar/assets/cover.jpg"
+  }
+]
