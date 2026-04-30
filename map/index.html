@@ -99,25 +99,6 @@
 const params = new URLSearchParams(window.location.search);
 const series = params.get("series") || "throne-of-glass";
 
-// Set initial UI state after everything loads
-document.addEventListener("DOMContentLoaded", function () {
-
-    // TODO: populate dynamically later from series-index.json
-    seriesSelect.innerHTML = `
-        <option value="throne-of-glass">Throne of Glass</option>
-        <option value="acotar">ACOTAR</option>
-    `;
-
-    seriesSelect.value = series;
-
-    // Series switching
-    seriesSelect.addEventListener("change", function () {
-        window.location.href = `./index.html?series=${this.value}`;
-    });
-
-});
-
-document.getElementById("seriesSelect").value = series;
 
 </script>
 
