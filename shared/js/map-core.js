@@ -259,43 +259,42 @@ function drawPoi() {
         pointToLayer: function(feature, latlng) {
             const type = feature.properties.Type;
 
-            if (type === "City") {
-                return L.circleMarker(latlng, {
-                    radius: 5,
-                    color: "yellow",
-                    weight: 1,
-                    fillColor: "gray",
-                    fillOpacity: 1
-                });
-            }
+            // IMAGE POI
+                if (type === "City") {
+                    return L.marker(latlng, {
+                        icon: starIcon,
+                        pane: 'poiPane'
+                    });
+                }
 
-            if (type === "Tower") {
+                if (type === "Tower") {
+                    return L.marker(latlng, {
+                        icon: towerIcon,
+                        pane: 'poiPane'
+                    });
+                }
+
+                // NO SYMBOL POI (label only)
+                if (type === "Ocean") {
+                    return L.marker(latlng, {
+                        icon: L.divIcon({
+                            className: 'empty-icon',
+                            html: '',
+                            iconSize: [0, 0]
+                        }),
+                        pane: 'poiPane'
+                    });
+                }
+
+                // MISC/DEFAULT
                 return L.circleMarker(latlng, {
                     radius: 5,
                     color: "black",
                     weight: 1,
-                    fillColor: "black",
-                    fillOpacity: 1
+                    fillColor: "gray",
+                    fillOpacity: 1,
+                    pane: 'poiPane'
                 });
-            }
-
-            if (type === "Ocean") {
-                return L.marker(latlng, {
-                    icon: L.divIcon({
-                        className: 'empty-icon',
-                        html: '',
-                        iconSize: [0, 0]
-                    })
-                });
-            }
-
-            return L.circleMarker(latlng, {
-                radius: 5,
-                color: "black",
-                weight: 1,
-                fillColor: "gray",
-                fillOpacity: 1
-            });
         },
 
         onEachFeature: function(feature, layer) {
