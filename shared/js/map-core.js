@@ -257,6 +257,7 @@ function drawPoi() {
         pane: 'poiPane',
 
         pointToLayer: function(feature, latlng) {
+            console.log("POI LOADED");
             const type = (feature.properties.Type || "").trim().toLowerCase();
 
                 // IMAGE POI
