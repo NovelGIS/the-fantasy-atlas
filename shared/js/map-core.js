@@ -309,7 +309,7 @@ function drawPoi() {
     }).addTo(map);
 
     console.log("POI features:", window.poiData.features.length);
-}
+};
 
 window.markers = L.markerClusterGroup({
     maxClusterRadius: 30,
