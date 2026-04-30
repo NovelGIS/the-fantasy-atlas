@@ -260,17 +260,11 @@ function drawPoi() {
             let type = feature.properties.Type?.trim().toLowerCase();
 
             if (type === "city") {
-                return L.marker(latlng, {
-                    icon: starIcon,
-                    pane: 'poiPane'
-                });
+                return L.marker(latlng, { icon: starIcon });
             }
 
             if (type === "tower") {
-                return L.marker(latlng, {
-                    icon: towerIcon,
-                    pane: 'poiPane'
-                });
+                return L.marker(latlng, { icon: towerIcon });
             }
 
             if (type === "ocean") {
@@ -279,18 +273,15 @@ function drawPoi() {
                         className: 'empty-icon',
                         html: '',
                         iconSize: [0, 0]
-                    }),
-                    pane: 'poiPane'
+                    })
                 });
             }
 
             return L.circleMarker(latlng, {
                 radius: 5,
                 color: "black",
-                weight: 1,
                 fillColor: "gray",
-                fillOpacity: 1,
-                pane: 'poiPane'
+                fillOpacity: 1
             });
         },
 
@@ -301,11 +292,11 @@ function drawPoi() {
                 className: "poi-label",
                 permanent: true
             });
+
+            window.markers.addLayer(layer);
         }
     });
-
-    window.markers.addLayer(poiLayer);
-};
+}
 
 window.markers = L.markerClusterGroup({
     maxClusterRadius: 30,
