@@ -312,9 +312,19 @@ function drawPoi() {
                     className: "poi-label",
                     permanent: true
                 });
-            }
-        }).addTo(map);
-}
+            },
+
+            poiLayer = L.geoJSON(window.poiData, {
+                pointToLayer: function(feature, latlng) {
+                    console.log("POINT LAYER RUNNING", feature);
+                    return L.circleMarker(latlng);
+                }
+            }).addTo(map),
+    });
+    
+    console.log("POI features:", window.poiData.features.length);
+        
+};
 
 window.markers = L.markerClusterGroup({
     maxClusterRadius: 30,
