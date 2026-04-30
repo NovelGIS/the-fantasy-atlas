@@ -257,17 +257,17 @@ function drawPoi() {
         pane: 'poiPane',
 
         pointToLayer: function(feature, latlng) {
-            const type = feature.properties.Type;
+            const type = (feature.properties.Type || "").trim().toLowerCase();
 
                 // IMAGE POI
-                if (type === "City") {
+                if (type === "city") {
                     return L.marker(latlng, {
                         icon: starIcon,
                         pane: 'poiPane'
                     });
                 }
 
-                if (type === "Tower") {
+                if (type === "tower") {
                     return L.marker(latlng, {
                         icon: towerIcon,
                         pane: 'poiPane'
@@ -275,7 +275,7 @@ function drawPoi() {
                 }
 
                 // NO SYMBOL POI (label only)
-                if (type === "Ocean") {
+                if (type === "ocean") {
                     return L.marker(latlng, {
                         icon: L.divIcon({
                             className: 'empty-icon',
