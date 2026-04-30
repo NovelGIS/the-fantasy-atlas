@@ -257,45 +257,43 @@ function drawPoi() {
             pane: 'poiPane',
 
             pointToLayer: function(feature, latlng) {
-                const type = feature.properties.Type;
+    let type = feature.properties.Type?.trim().toLowerCase();
 
-                // IMAGE POI
-                if (type === "City") {
-                    return L.marker(latlng, {
-                        icon: starIcon,
-                        pane: 'poiPane'
-                    });
-                }
+    if (type === "city") {
+        return L.marker(latlng, {
+            icon: starIcon,
+            pane: 'poiPane'
+        });
+    }
 
-                if (type === "Tower") {
-                    return L.marker(latlng, {
-                        icon: towerIcon,
-                        pane: 'poiPane'
-                    });
-                }
+    if (type === "tower") {
+        return L.marker(latlng, {
+            icon: towerIcon,
+            pane: 'poiPane'
+        });
+    }
 
-                // NO SYMBOL POI (label only)
-                if (type === "Ocean") {
-                    return L.marker(latlng, {
-                        icon: L.divIcon({
-                            className: 'empty-icon',
-                            html: '',
-                            iconSize: [0, 0]
-                        }),
-                        pane: 'poiPane'
-                    });
-                }
+    if (type === "ocean") {
+        return L.marker(latlng, {
+            icon: L.divIcon({
+                className: 'empty-icon',
+                html: '',
+                iconSize: [0, 0]
+            }),
+            pane: 'poiPane'
+        });
+    }
 
-                // MISC/DEFAULT
-                return L.circleMarker(latlng, {
-                    radius: 5,
-                    color: "black",
-                    weight: 1,
-                    fillColor: "gray",
-                    fillOpacity: 1,
-                    pane: 'poiPane'
-                });
-            },
+    // fallback
+    return L.circleMarker(latlng, {
+        radius: 5,
+        color: "black",
+        weight: 1,
+        fillColor: "gray",
+        fillOpacity: 1,
+        pane: 'poiPane'
+    });
+},
 
             onEachFeature: function(feature, layer) {
                 layer.bindTooltip(feature.properties.Name, {
