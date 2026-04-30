@@ -254,44 +254,56 @@ function drawWater() {
 
 function drawPoi() {
     poiLayer = L.geoJSON(window.poiData, {
-        pointToLayer: function(feature, latlng) {
-            let type = feature.properties.Type?.trim().toLowerCase();
+            pane: 'poiPane',
 
-            if (type === "city") {
-                return L.marker(latlng, { icon: starIcon });
-            }
+            pointToLayer: function(feature, latlng) {
+    let type = feature.properties.Type?.trim().toLowerCase();
 
-            if (type === "tower") {
-                return L.marker(latlng, { icon: towerIcon });
-            }
+    if (type === "city") {
+        return L.marker(latlng, {
+            icon: starIcon,
+            pane: 'poiPane'
+        });
+    }
 
-            if (type === "ocean") {
-                return L.marker(latlng, {
-                    icon: L.divIcon({
-                        className: 'empty-icon',
-                        html: '',
-                        iconSize: [0, 0]
-                    })
+    if (type === "tower") {
+        return L.marker(latlng, {
+            icon: towerIcon,
+            pane: 'poiPane'
+        });
+    }
+
+    if (type === "ocean") {
+        return L.marker(latlng, {
+            icon: L.divIcon({
+                className: 'empty-icon',
+                html: '',
+                iconSize: [0, 0]
+            }),
+            pane: 'poiPane'
+        });
+    }
+
+    // fallback
+    return L.circleMarker(latlng, {
+        radius: 5,
+        color: "black",
+        weight: 1,
+        fillColor: "gray",
+        fillOpacity: 1,
+        pane: 'poiPane'
+    });
+}
+
+            onEachFeature: function(feature, layer) {
+                layer.bindTooltip(feature.properties.Name, {
+                    direction: "top",
+                    offset: [-20, 0],
+                    className: "poi-label",
+                    permanent: true
                 });
             }
-
-            return L.circleMarker(latlng, {
-                radius: 5,
-                color: "black",
-                fillColor: "gray",
-                fillOpacity: 1
-            });
-        },
-
-        onEachFeature: function(feature, layer) {
-            layer.bindTooltip(feature.properties.Name, {
-                direction: "top",
-                offset: [-20, 0],
-                className: "poi-label",
-                permanent: true
-            });
-        }
-    }).addTo(map); 
+        }).addTo(map);
 }
 
 window.markers = L.markerClusterGroup({
