@@ -254,8 +254,6 @@ function drawWater() {
 
 function drawPoi() {
     poiLayer = L.geoJSON(window.poiData, {
-        pane: 'poiPane',
-
         pointToLayer: function(feature, latlng) {
             let type = feature.properties.Type?.trim().toLowerCase();
 
@@ -294,7 +292,7 @@ function drawPoi() {
             });
         }
     }).addTo(map); 
-};
+}
 
 window.markers = L.markerClusterGroup({
     maxClusterRadius: 30,
