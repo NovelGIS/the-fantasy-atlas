@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>"Throne of Glass" Character Tracker Map</title>
+    <meta charset="utf-8" />
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<!-- MarkerCluster CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
+
+<!-- Leaflet JS (REQUIRED) -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- MarkerCluster JS (AFTER Leaflet) -->
+<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+
+<div class="map-title">"Throne of Glass" Character Tracker Map</div>
+<div id="map"></div>
+
+    <style>
+        #map { height: 100vh; }
+
+        .map-title {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .poi-label {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            color:#2b2b2b;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 0;
+            text-shadow: 1px 1px 3px rgba(255,255,255,0.8);
+            font-family: "Cinzel", serif;
+        }
+
+        /* removes the triangle in the label */
+        .poi-label::before { 
+             display: none;
+        }
+        .habitat-label {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            font-family: "Cinzel", serif;
+            font-size: 12px;
+            font-weight: bold;
+            color: #5a4a2f;
+            text-shadow: 1px 1px 3px rgba(255,255,255,0.8);
+            }
+
+        /* removes the triangle in the label */
+        .habitat-label::before {
+            display: none;
+        }
+
+        .habitat-label {
+            white-space: normal;
+            max-width: 150px;
+            text-align: center;
+        }
+
+        .region-label {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            font-family: "Cinzel", serif;
+            font-size: 20px;
+            font-weight: bold;
+            color: #525C50;
+            text-shadow: 1px 1px 3px rgba(255,255,255,0.8);
+        }
+
+        /* removes the triangle in the label */
+        .region-label::before {
+            display: none;
+        }
+
+        .region-label {
+            white-space: normal;
+            max-width: 200px;
+            text-align: center;
+        }
+
+        .character-label {
+            background: white;
+            border: none;
+            box-shadow: none;
+            padding: 2px;
+            font-family: "Inter", serif;
+            font-size: 14px;
+            font-weight: bold;
+            color: black;
+        }
+
+        /* removes the triangle in the label */
+        .character-label::before {
+            display: none;
+        }
+
+        .character-label {
+            white-space: normal;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .controls {
+            position: absolute;
+            top: 55px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 14px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Dropdown styling */
+        .controls select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Cpath d='M0 2l5 5 5-5' fill='none' stroke='black'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 10px;
+
+            padding: 6px 30px 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+
+            background-color: white;
+            cursor: pointer;
+        }
+
+        /* Hover/focus */
+        .controls select:hover {
+            border-color: #888;
+        }
+
+        .controls select:focus {
+            outline: none;
+            border-color: #555;
+        }
+       
+    </style>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Uncial+Antiqua&family=IM+Fell+English&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="controls">
+    <select id="bookSelect" onchange="updateFilters()">
+        <option value="">All Books</option>
+        <option value="TOG">Throne of Glass</option>
+        <option value="COM">Crown of Midnight</option>
+        <option value="AB">The Assassin's Blade</option>
+        <option value="HOF">Heir of Fire</option>
+        <option value="QOS">Queen of Shadows</option>
+        <option value="EOSTOD">Empire of Storms/Tower of Dawn</option>
+        <option value="KOA">Kingdom of Ash</option>
+    </select>
+
+    <select id="chapterSelect" onchange="updateFilters()">
+        <option value="">All Chapters</option>
+    </select>
+</div>
+
+<div id="map"></div>
+
+<script>
+// Create map
+var map = L.map('map', {
+    maxZoom: 22
+}).setView([20, 0], 2);
+
+//basemap
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+    maxZoom: 19  // tile limit
+}).addTo(map);
+
+map.createPane('landPane');
+map.createPane('landareasPane');
+map.createPane('habitatPane');
+map.createPane('poilinesPane');
+map.createPane('waterPane');
+map.createPane('poiPane');
+map.createPane('characterPane');
+
+// Set draw order (higher # = on top)
+map.getPane('landPane').style.zIndex = 200;
+map.getPane('landareasPane').style.zIndex = 250;
+map.getPane('habitatPane').style.zIndex = 300;
+map.getPane('poilinesPane').style.zIndex = 350;
+map.getPane('waterPane').style.zIndex = 400;
+map.getPane('poiPane').style.zIndex = 450;
+map.getPane('characterPane').style.zIndex = 1000;
+
+var starIcon = L.icon({
+    iconUrl: 'icons/star.png',
+    iconSize: [25, 25],       // size of the icon
+    iconAnchor: [12, 12],     // center point
+    popupAnchor: [0, -10]
+});
+
+// LAND
+fetch('Land_040426.geojson')
+    .then(response => response.json())
+    .then(data => {
+        var landLayer = L.geoJSON(data, {
+            pane: 'landPane',
+            style: {
+            color: "#101B12", 
+            fillColor: "#949C77"}
+        }).addTo(map);
+        map.fitBounds(landLayer.getBounds());
+    });
+
+// LAND-AREAS
+fetch('Land_Areas_040426.geojson')
+    .then(response => response.json())
+    .then(data => {
+        var landareaLayer = L.geoJSON(data, {
+            pane: 'landareasPane',
+            style: {
+            color: "#101B12",
+            weight: 1,
+            fillColor: "#949C77",
+            fillOpacity: 0.6 },
+      
+            onEachFeature: function(feature, layer) {
+                const name = feature.properties.Name;
+
+                // Split label manually or format as needed
+                const formatted = name.replace(" - ", "<br>");
+
+                layer.bindTooltip(formatted, {
+                    permanent: true,
+                    direction: "center",
+                    className: "region-label"
+                });
+
+                // Show labels at map level 14+
+                map.on('zoomend', function() {
+                    if (map.getZoom() >= 14) {
+                        layer.openTooltip();
+                    } else {
+                        layer.closeTooltip();
+                    }
+                });
+            }
+        }).addTo(map);
+
+    }); 
+
+// HABITAT
+fetch('Habitat_040426.geojson')
+    .then(response => response.json())
+    .then(data => {
+
+        var habitatLayer = L.geoJSON(data, {
+            pane: 'habitatPane',
+
+            style: function(feature) {
+                let type = feature.properties.Type;
+                return {
+                    color: "#555",
+                    weight: 1,
+                    fillOpacity: 0.9,
+                    fillColor:
+                        type === "Forest" ? "#465D38" :
+                        type === "Desert" ? "#F6F7ED" :
+                        type === "Mountain" ? "#E6E6E6" :
+                        type === "Lake" ? "#294973" :
+                        "#ccc"
+                };
+            },
+
+            onEachFeature: function(feature, layer) {
+                const name = feature.properties.Name;
+
+                // Split label manually or format as needed
+                const formatted = name.replace(" - ", "<br>");
+
+                layer.bindTooltip(formatted, {
+                    permanent: true,
+                    direction: "center",
+                    className: "habitat-label"
+                });
+
+                // Show labels at map level 16+
+                map.on('zoomend', function() {
+                    if (map.getZoom() >= 16) {
+                        layer.openTooltip();
+                    } else {
+                        layer.closeTooltip();
+                    }
+                });
+            }
+
+        }).addTo(map);
+
+    });
+
+// POI-Lines
+fetch('POI_Lines_040426.geojson')
+  .then(response => response.json())
+  .then(data => {
+        var poilinesLayer = L.geoJSON(data, {
+            pane: 'poilinesPane',
+            style: { color: "#808080", fillColor: "#ccc", fillOpacity: 0.5 },
+
+            onEachFeature: function(feature, layer) {
+                const name = feature.properties.Name;
+
+                // Split label manually or format as needed
+                const formatted = name.replace(" - ", "<br>");
+
+                layer.bindTooltip(formatted, {
+                    permanent: true,
+                    direction: "center",
+                    className: "poi-label"
+                });
+
+                // Show labels at map level 16+
+                map.on('zoomend', function() {
+                    if (map.getZoom() >= 16) {
+                        layer.openTooltip();
+                    } else {
+                        layer.closeTooltip();
+                    }
+                });
+            }
+        }).addTo(map);
+    }); 
+
+// Water
+fetch('Water_040426.geojson')
+    .then(response => response.json())
+    .then(data => {
+        var waterLayer = L.geoJSON(data, {
+            pane: 'waterPane', //assigns a pane which then gets weighted
+            style: { 
+                    color: "#294973", 
+                    fillColor: "#294973", 
+                    fillOpacity: 0 
+            }
+        }).addTo(map);
+
+    });
+
+// POI
+fetch('POI_040426.geojson')
+    .then(response => response.json())
+    .then(data => {
+        var poiLayer = L.geoJSON(data, {
+            pane: 'poiPane',
+
+            pointToLayer: function(feature, latlng) {
+                const type = feature.properties.Type;
+
+                // IMAGE POI
+                if (type === "City") {
+                    return L.marker(latlng, {
+                        icon: starIcon,
+                        pane: 'poiPane'
+                    });
+                }
+
+                // NO SYMBOL POI (label only)
+                if (type === "Ocean") {
+                    return L.marker(latlng, {
+                        icon: L.divIcon({
+                            className: 'empty-icon',
+                            html: '',
+                            iconSize: [0, 0]
+                        }),
+                        pane: 'poiPane'
+                    });
+                }
+
+                // MISC/DEFAULT
+                return L.circleMarker(latlng, {
+                    radius: 5,
+                    color: "black",
+                    weight: 1,
+                    fillColor: "gray",
+                    fillOpacity: 1,
+                    pane: 'poiPane'
+                });
+            },
+
+            onEachFeature: function(feature, layer) {
+                layer.bindTooltip(feature.properties.Name, {
+                    permanent: true,
+                    direction: "top",
+                    offset: [-20, 0],
+                    className: "poi-label"
+                });
+
+                map.on('zoomend', function() {
+                        if (map.getZoom() >= 16) {
+                            layer.openTooltip();
+                        } else {
+                            layer.closeTooltip();
+                        }
+                });
+            }
+        }).addTo(map);
+    }); 
+
+// CHARACTERS
+let allCharacterData;
+var characterLayer;
+var markers = L.markerClusterGroup({
+    maxClusterRadius: 18
+});
+
+function updateFilters() {
+    showFiltered();
+}
+
+function showFiltered() {
+
+    let selectedBook = document.getElementById("bookSelect").value;
+    let selectedChapter = document.getElementById("chapterSelect").value;
+
+    markers.clearLayers();
+
+    characterLayer = L.geoJSON(allCharacterData, {
+
+        filter: function (feature) {
+            let matchBook = selectedBook ? feature.properties.Book === selectedBook : true;
+            let matchChapter = selectedChapter ? feature.properties.Chapter == selectedChapter : true;
+            return matchBook && matchChapter;
+        },
+
+        pointToLayer: function (feature, latlng) {
+            return L.circleMarker(latlng, {
+                radius: 6,
+                fillColor: "white",
+                color: "white",
+                weight: 1,
+                fillOpacity: 1
+            });
+        },
+
+        onEachFeature: function(feature, layer) {
+            const name = feature.properties.Character;
+
+            // Split label manually or format as needed
+            const formatted = name.replace(" - ", "<br>");
+
+            layer.bindTooltip(formatted, {
+                permanent: true,
+                direction: "center",
+                className: "character-label"
+            });
+
+            map.on('zoomend', function() {
+                if (map.getZoom() >= 6) {
+                    layer.openTooltip();
+                } else {
+                    layer.closeTooltip();
+                }
+            });
+        }
+    });
+
+    markers.addLayer(characterLayer);
+    map.addLayer(markers);
+}
+
+fetch('Characters-Chapters_040426.geojson')
+    .then(response => response.json())
+    .then(data => {
+        allCharacterData = data;
+
+        console.log("Loaded features:", data.features.length);
+
+        populateChapterDropdown();
+        showFiltered();
+    });
+
+    function populateChapterDropdown() {
+
+        const chapterSelect = document.getElementById("chapterSelect");
+
+        chapterSelect.innerHTML = '<option value="">All Chapters</option>';
+
+        let chapters = [...new Set(
+            allCharacterData.features.map(f => f.properties.Chapter)
+        )];
+
+        chapters.sort((a, b) => a - b);
+
+        chapters.forEach(ch => {
+            let option = document.createElement("option");
+            option.value = ch;
+            option.text = "Chapter " + ch;
+            chapterSelect.appendChild(option);
+        });
+    }
+
+</script>
+</body>
+</html>
