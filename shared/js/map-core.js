@@ -259,7 +259,7 @@ function drawPoi() {
         pointToLayer: function(feature, latlng) {
             const type = feature.properties.Type;
 
-            // IMAGE POI
+                // IMAGE POI
                 if (type === "City") {
                     return L.marker(latlng, {
                         icon: starIcon,
