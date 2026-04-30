@@ -292,11 +292,9 @@ function drawPoi() {
                 className: "poi-label",
                 permanent: true
             });
-
-            window.markers.addLayer(layer);
         }
-    });
-}
+    }).addTo(map); 
+};
 
 window.markers = L.markerClusterGroup({
     maxClusterRadius: 30,
