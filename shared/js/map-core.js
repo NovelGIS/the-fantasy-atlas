@@ -261,15 +261,23 @@ function drawPoi() {
 
                 // IMAGE POI
                 if (type === "City") {
-                    return L.marker(latlng, {
-                        icon: starIcon,
+                    return L.circleMarker(latlng, {
+                        radius: 5,
+                        color: "yellow",
+                        weight: 1,
+                        fillColor: "gray",
+                        fillOpacity: 1,
                         pane: 'poiPane'
                     });
                 }
 
                 if (type === "Tower") {
-                    return L.marker(latlng, {
-                        icon: towerIcon,
+                    return L.circleMarker(latlng, {
+                        radius: 5,
+                        color: "black",
+                        weight: 1,
+                        fillColor: "black",
+                        fillOpacity: 1,
                         pane: 'poiPane'
                     });
                 }
