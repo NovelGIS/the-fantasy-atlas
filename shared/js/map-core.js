@@ -251,80 +251,65 @@ function drawWater() {
     }).addTo(map);
 
 }
-console.log("POI DATA AT DRAW TIME:", window.poiData);
+
 function drawPoi() {
     poiLayer = L.geoJSON(window.poiData, {
-            pane: 'poiPane',
+        pane: 'poiPane',
 
-            pointToLayer: function(feature, latlng) {
-                const type = feature.properties.Type;
+        pointToLayer: function(feature, latlng) {
+            const type = feature.properties.Type;
 
-                // IMAGE POI
-                if (type === "City") {
-                    return L.circleMarker(latlng, {
-                        radius: 5,
-                        color: "yellow",
-                        weight: 1,
-                        fillColor: "gray",
-                        fillOpacity: 1,
-                        pane: 'poiPane'
-                    });
-                }
+            if (type === "City") {
+                return L.circleMarker(latlng, {
+                    radius: 5,
+                    color: "yellow",
+                    weight: 1,
+                    fillColor: "gray",
+                    fillOpacity: 1
+                });
+            }
 
-                if (type === "Tower") {
-                    return L.circleMarker(latlng, {
-                        radius: 5,
-                        color: "black",
-                        weight: 1,
-                        fillColor: "black",
-                        fillOpacity: 1,
-                        pane: 'poiPane'
-                    });
-                }
-
-                // NO SYMBOL POI (label only)
-                if (type === "Ocean") {
-                    return L.marker(latlng, {
-                        icon: L.divIcon({
-                            className: 'empty-icon',
-                            html: '',
-                            iconSize: [0, 0]
-                        }),
-                        pane: 'poiPane'
-                    });
-                }
-
-                // MISC/DEFAULT
+            if (type === "Tower") {
                 return L.circleMarker(latlng, {
                     radius: 5,
                     color: "black",
                     weight: 1,
-                    fillColor: "gray",
-                    fillOpacity: 1,
-                    pane: 'poiPane'
+                    fillColor: "black",
+                    fillOpacity: 1
                 });
-            },
+            }
 
-            onEachFeature: function(feature, layer) {
-                layer.bindTooltip(feature.properties.Name, {
-                    direction: "top",
-                    offset: [-20, 0],
-                    className: "poi-label",
-                    permanent: true
+            if (type === "Ocean") {
+                return L.marker(latlng, {
+                    icon: L.divIcon({
+                        className: 'empty-icon',
+                        html: '',
+                        iconSize: [0, 0]
+                    })
                 });
-            },
+            }
 
-            poiLayer = L.geoJSON(window.poiData, {
-                pointToLayer: function(feature, latlng) {
-                    console.log("POINT LAYER RUNNING", feature);
-                    return L.circleMarker(latlng);
-                }
-            }).addTo(map),
-    });
-    
+            return L.circleMarker(latlng, {
+                radius: 5,
+                color: "black",
+                weight: 1,
+                fillColor: "gray",
+                fillOpacity: 1
+            });
+        },
+
+        onEachFeature: function(feature, layer) {
+            layer.bindTooltip(feature.properties.Name, {
+                direction: "top",
+                offset: [-20, 0],
+                className: "poi-label",
+                permanent: true
+            });
+        }
+    }).addTo(map);
+
     console.log("POI features:", window.poiData.features.length);
-        
-};
+}
 
 window.markers = L.markerClusterGroup({
     maxClusterRadius: 30,
