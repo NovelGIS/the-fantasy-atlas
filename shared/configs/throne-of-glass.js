@@ -9,9 +9,9 @@ window.SERIES_CONFIG = {
         "COM": 56,
         "HOF": 68,
         "QOS": 63,
-        "EOS": 70,  // ** DOUBLE CHECK **
-        "TOD": 59, // ** DOUBLE CHECK **
-        "KOA": 120
+        "EOS": 75, 
+        "TOD": 69,
+        "KOA": 122
     },
 
     assassinBladeStructure: [
