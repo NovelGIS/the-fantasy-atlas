@@ -8,7 +8,7 @@ window.SERIES_CONFIG = {
         "TOG": 55,
         "COM": 56,
         "HOF": 68,
-        "QOS": 63,
+        "QOS": 89,
         "EOS": 75, 
         "TOD": 69,
         "KOA": 122
