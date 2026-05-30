@@ -48,7 +48,7 @@ function updateFilters() {
 // Tells the map which points to show
 function showFiltered() {
 
-    let selectedBook = document.getElementById("bookSelect").value;
+    const selectedBook = currentBook;
     let selectedValue = document.getElementById("chapterSelect").value;
 
     let selectedChapter;

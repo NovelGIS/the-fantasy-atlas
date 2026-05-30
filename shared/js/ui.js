@@ -1,22 +1,9 @@
 // UI INTERACTIONS
 
+let currentBook = "TOG";
+let currentMode = "single";
+
 document.addEventListener("DOMContentLoaded", function () {
-
-    document.getElementById("bookSelect").addEventListener("change", function () {
-        const selectedBook = this.value;
-
-        updateChapterDropdown(selectedBook);
-
-        // force reset chapter state FIRST
-        const chapterSelect = document.getElementById("chapterSelect");
-        chapterSelect.selectedIndex = 0;
-        currentChapter = 1;
-
-        showFiltered();
-
-        // updates nav AFTER state is correct
-        updateChapterNav();
-    });
 
     // CHARACTER VISIBILITY TOGGLE BUTTON
     // Toggles marker layer visibility on/off without changing filters
@@ -65,25 +52,74 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function populateBooks() {
-    const bookSelect = document.getElementById("bookSelect");
-    if (!bookSelect) return;
 
-    bookSelect.innerHTML = "";
+    const container = document.getElementById("bookButtons");
+    if (!container) return;
 
-    // Define the exact order you want
+    container.innerHTML = "";
+
     const bookOrder = ["TOG", "COM", "AB", "HOF", "QOS", "EOS", "TOD", "KOA"];
 
     bookOrder.forEach(book => {
-        // Skip if it doesn't exist in this series config
+
         if (
-            CONFIG.bookChapters[book] !== undefined || 
+            CONFIG.bookChapters[book] !== undefined ||
             book === "AB"
         ) {
-            const option = document.createElement("option");
-            option.value = book;
-            option.textContent = CONFIG.bookNames[book] || book;
-            bookSelect.appendChild(option);
+
+            const button = document.createElement("button");
+
+            button.className = "book-pill";
+            button.dataset.book = book;
+
+            button.textContent = CONFIG.bookNames[book] || book;
+
+            // active state
+            if (book === currentBook) {
+                button.classList.add("active");
+            }
+
+            button.addEventListener("click", () => {
+
+                currentBook = book;
+                currentMode = "single";
+
+                updateChapterDropdown(currentBook);
+
+                currentChapter = 1;
+
+                showFiltered();
+                updateChapterNav();
+
+                // refresh active pills
+                document.querySelectorAll(".book-pill")
+                    .forEach(btn => btn.classList.remove("active"));
+
+                button.classList.add("active");
+            });
+
+            container.appendChild(button);
         }
     });
-};
+
+    // TANDEM BUTTON
+    const tandemButton = document.createElement("button");
+
+    tandemButton.className = "book-pill tandem-pill";
+    tandemButton.textContent = "EOS/TOD Tandem Read";
+
+    tandemButton.addEventListener("click", () => {
+
+        currentMode = "tandem";
+
+        // your tandem logic here
+
+        document.querySelectorAll(".book-pill")
+            .forEach(btn => btn.classList.remove("active"));
+
+        tandemButton.classList.add("active");
+    });
+
+    container.appendChild(tandemButton);
+}
 

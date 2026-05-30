@@ -110,7 +110,7 @@ loadSeriesConfig(series).then(() => {
 
         const firstBook = Object.keys(CONFIG.bookChapters)[0];
 
-        document.getElementById("bookSelect").value = firstBook;
+        currentBook = firstBook;
 
         updateChapterDropdown(firstBook);
         updateFilters();
