@@ -2,10 +2,27 @@
 
 // Every time a book is selected from the drop-down, the Chapter drop-down is updated
 function updateChapterDropdown(book) {
+
     const chapterSelect = document.getElementById("chapterSelect");
 
-    // Clear existing options
     chapterSelect.innerHTML = "";
+
+    if (currentMode === "tandem") {
+
+        CONFIG.tandemRead.forEach((step, index) => {
+
+            const option = document.createElement("option");
+
+            option.value = index;
+            option.textContent = step.label;
+
+            chapterSelect.appendChild(option);
+        });
+
+        chapterSelect.selectedIndex = 0;
+
+        return;
+    }
 
     // Special case for TOG Assassin's Blade
     if (book === "AB") {
@@ -69,6 +86,16 @@ function showFiltered() {
     characterLayer = L.geoJSON(allCharacterData, {
 
         filter: function (feature) {
+
+            if (currentMode === "tandem") {
+
+                const tandemStep = getCurrentTandemStep();
+
+                return tandemStep.visible.some(entry =>
+                    feature.properties.Book === entry.Book &&
+                    feature.properties.Chapter == entry.Chapter
+                );
+            }
 
             let matchBook = selectedBook 
                 ? feature.properties.Book === selectedBook 
@@ -160,4 +187,11 @@ function resetChapterState() {
 
     chapterSelect.selectedIndex = 0;
     currentChapter = 1;
+}
+
+function getCurrentTandemStep() {
+
+    const select = document.getElementById("chapterSelect");
+
+    return CONFIG.tandemRead[select.selectedIndex];
 }

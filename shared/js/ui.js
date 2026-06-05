@@ -112,7 +112,10 @@ function populateBooks() {
 
         currentMode = "tandem";
 
-        // your tandem logic here
+        updateChapterDropdown();
+
+        showFiltered();
+        updateChapterNav();
 
         document.querySelectorAll(".book-pill")
             .forEach(btn => btn.classList.remove("active"));

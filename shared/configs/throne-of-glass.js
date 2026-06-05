@@ -42,4 +42,107 @@ window.SERIES_CONFIG = {
         TOD: "Tower of Dawn",
         KOA: "Kingdom of Ash"
     },
+
+    tandemRead: [
+
+    {
+        label: "EOS - Ch 1",
+        current: { Book: "EOS", Chapter: 1 },
+        visible: [
+            { Book: "EOS", Chapter: 1 }
+        ]
+    },
+
+    {
+        label: "EOS - Ch 2",
+        current: { Book: "EOS", Chapter: 2 },
+        visible: [
+            { Book: "EOS", Chapter: 2 }
+        ]
+    },
+
+    {
+        label: "EOS - Ch 3",
+        current: { Book: "EOS", Chapter: 3 },
+        visible: [
+            { Book: "EOS", Chapter: 3 }
+        ]
+    },
+
+    {
+        label: "EOS - Ch 4",
+        current: { Book: "EOS", Chapter: 4 },
+        visible: [
+            { Book: "EOS", Chapter: 4 }
+        ]
+    },
+
+    {
+        label: "EOS - Ch 5",
+        current: { Book: "EOS", Chapter: 5 },
+        visible: [
+            { Book: "EOS", Chapter: 5 }
+        ]
+    },
+
+    {
+        label: "TOD - Ch 1",
+        current: { Book: "TOD", Chapter: 1 },
+        visible: [
+            { Book: "EOS", Chapter: 6 },
+            { Book: "TOD", Chapter: 1 }
+        ]
+    },
+
+    {
+        label: "EOS - Ch 6",
+        current: { Book: "EOS", Chapter: 6 },
+        visible: [
+            { Book: "EOS", Chapter: 6 },
+            { Book: "TOD", Chapter: 2 }
+        ]
+    },
+
+    {
+        label: "EOS - Ch 7",
+        current: { Book: "EOS", Chapter: 7 },
+        visible: [
+            { Book: "EOS", Chapter: 7 },
+            { Book: "TOD", Chapter: 2 }
+        ]
+    },
+    {
+        label: "EOS - Ch 8",
+        current: { Book: "EOS", Chapter: 8 },
+        visible: [
+            { Book: "EOS", Chapter: 8 },
+            { Book: "TOD", Chapter: 2 }
+        ]
+    },
+    {
+        label: "TOD - Ch 2",
+        current: { Book: "TOD", Chapter: 2 },
+        visible: [
+            { Book: "EOS", Chapter: 9 },
+            { Book: "TOD", Chapter: 2 }
+        ]
+    },
+    {
+        label: "TOD - Ch 3",
+        current: { Book: "TOD", Chapter: 3 },
+        visible: [
+            { Book: "EOS", Chapter: 9 },
+            { Book: "TOD", Chapter: 3 }
+        ]
+    },
+    {
+        label: "EOS - Ch 9",
+        current: { Book: "EOS", Chapter: 9 },
+        visible: [
+            { Book: "EOS", Chapter: 9 },
+            { Book: "TOD", Chapter: 4 }
+        ]
+    }
+
+]
 };
